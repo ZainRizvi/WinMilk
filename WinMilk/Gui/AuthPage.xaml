@@ -1,0 +1,60 @@
+﻿<phone:PhoneApplicationPage 
+	x:Class="WinMilk.Gui.AuthPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:phone="clr-namespace:Microsoft.Phone.Controls;assembly=Microsoft.Phone"
+    xmlns:shell="clr-namespace:Microsoft.Phone.Shell;assembly=Microsoft.Phone"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:con="clr-namespace:WinMilk.Gui.Controls"
+    FontFamily="{StaticResource PhoneFontFamilyNormal}"
+    FontSize="{StaticResource PhoneFontSizeNormal}"
+    Foreground="{StaticResource PhoneForegroundBrush}"
+    SupportedOrientations="Portrait" Orientation="Portrait"
+    mc:Ignorable="d" d:DesignHeight="768" d:DesignWidth="480"
+    shell:SystemTray.IsVisible="True"
+    DataContext="{Binding RelativeSource={RelativeSource Self}}"
+    Loaded="PhoneApplicationPage_Loaded"
+    con:TiltEffect.IsTiltEnabled="True">
+
+	<Grid x:Name="LayoutRoot" Background="{StaticResource PhoneBackgroundBrush}">
+		<Grid.RowDefinitions>
+			<RowDefinition Height="170"/>
+			<RowDefinition Height="*"/>
+		</Grid.RowDefinitions>
+
+		<!--This is the name of the application and page title-->
+        <StackPanel x:Name="TitlePanel" Grid.Row="0" Margin="12,17,0,28">
+            <TextBlock x:Name="ApplicationTitle" Text="{Binding Path=Loc.AppNameCaps, Source={StaticResource L10N}}" Style="{StaticResource PhoneTextNormalStyle}"/>
+            <TextBlock x:Name="PageTitle" Text="{Binding Path=Loc.AuthPageTitle, Source={StaticResource L10N}}" Margin="9,-7,0,0" Style="{StaticResource PhoneTextTitle1Style}"/>
+        </StackPanel>
+
+        <!--This section is empty. Place new content here Grid.Row="1"-->
+		<Grid Grid.Row="1" x:Name="ContentGrid">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="10"/>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="80" />
+            </Grid.RowDefinitions>
+
+            <ProgressBar Grid.Row="0" IsIndeterminate="{Binding IsLoading}" 
+                         Visibility="{Binding IsLoading, Converter={StaticResource VisibilityConverter}}"  
+                         Style="{StaticResource PerformanceProgressBar}"/>
+
+            <phone:WebBrowser Name="webBrowser1" Grid.Row="1" Navigating="webBrowser1_Navigating" Navigated="webBrowser1_Navigated"/>
+
+            <Grid Grid.Row="2">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="150" />
+                </Grid.ColumnDefinitions>
+                
+                <TextBlock TextWrapping="Wrap" VerticalAlignment="Center" Name="AuthStatus" 
+                           Text="{Binding Path=Loc.AuthInstructions, Source={StaticResource L10N}}"/>
+                <con:IconButton Text="{Binding Path=Loc.AuthDoneButton, Source={StaticResource L10N}}" Type="check" Click="AuthDoneButton_Click" Grid.Column="1"/>
+            </Grid>
+        </Grid>
+        
+        
+	</Grid>
+</phone:PhoneApplicationPage>
