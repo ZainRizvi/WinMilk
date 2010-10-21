@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.Linq;
 using System.Net;
 using System.Windows;
@@ -12,30 +11,20 @@ using System.Windows.Media.Animation;
 using System.Windows.Shapes;
 using Microsoft.Phone.Controls;
 using Microsoft.Phone.Shell;
-using IronCow;
+using System.Collections.ObjectModel;
 
 namespace WinMilk.Gui
 {
     public partial class ListPage : PhoneApplicationPage
     {
-        public static readonly DependencyProperty ListsProperty =
-               DependencyProperty.Register("Lists", typeof(ObservableCollection<TaskList>), typeof(ListPage),
-                   new PropertyMetadata((ObservableCollection<TaskList>)null));
+        public static readonly DependencyProperty ListNameProperty =
+               DependencyProperty.Register("ListName", typeof(string), typeof(ListPage),
+                   new PropertyMetadata(string.Empty));
 
-        public ObservableCollection<TaskList> Lists
+        public string ListName
         {
-            get { return (ObservableCollection<TaskList>)GetValue(ListsProperty); }
-            set { SetValue(ListsProperty, value); }
-        }
-
-        public static readonly DependencyProperty CurrentListProperty =
-               DependencyProperty.Register("CurrentList", typeof(TaskList), typeof(ListPage),
-                   new PropertyMetadata(new TaskList(), new PropertyChangedCallback(OnCurrentListChanged)));
-
-        public TaskList CurrentList
-        {
-            get { return (TaskList)GetValue(CurrentListProperty); }
-            set { SetValue(CurrentListProperty, value); }
+            get { return (string)GetValue(ListNameProperty); }
+            set { SetValue(ListNameProperty, value); }
         }
 
         public static readonly DependencyProperty IsLoadingProperty =
@@ -55,66 +44,38 @@ namespace WinMilk.Gui
 
         private void PhoneApplicationPage_Loaded(object sender, RoutedEventArgs e)
         {
-            LoadAllLists();
-
             CreateApplicationBar();
         }
-        
+
         protected override void OnNavigatedTo(System.Windows.Navigation.NavigationEventArgs e)
         {
+            string idStr;
+
+            if (this.NavigationContext.QueryString.TryGetValue("id", out idStr))
+            {
+                LoadList(idStr);
+            }
+
             base.OnNavigatedTo(e);
         }
 
-        private void LoadAllLists()
+        private void LoadList(string idStr)
         {
+            int id = int.Parse(idStr);
+            /*
             IsLoading = true;
-            
-            App.RtmClient.GetLists((lists) =>
+
+            App.RtmClient.GetList(id, (RTM.TaskList l) =>
             {
-                IsLoading = false;
+                ListName = l.Name;
 
-                Lists = new ObservableCollection<TaskList>();
-                
-                foreach (TaskList l in lists)
+                App.RtmClient.GetTasksInList(l, (ObservableCollection<RTM.Task> tasks) =>
                 {
-                    Lists.Add(l);
-                }
-
-                string idStr;
-
-                if (this.NavigationContext.QueryString.TryGetValue("id", out idStr))
-                {
-                    // set current list
-                    int listId = int.Parse(idStr);
-
-                    // find list by id, and select it
-                    foreach (TaskList l in Lists)
-                    {
-                        if (l.Id == listId)
-                        {
-                            CurrentList = l;
-                            break;
-                        }
-                    }
-                }
-            }, false);
-        }
-
-        private void LoadList(TaskList list)
-        {
-            IsLoading = true;
-
-            App.RtmClient.GetTasksInList(list, (ObservableCollection<Task> tasks) =>
-                {
-                    list.Tasks = new ObservableCollection<Task>();
-
-                    foreach (Task t in tasks)
-                    {
-                        list.Tasks.Add(t);
-                    }
+                    Tasks.list.ItemsSource = tasks;
 
                     IsLoading = false;
                 }, false);
+            });*/
         }
 
         private void CreateApplicationBar()
@@ -135,43 +96,6 @@ namespace WinMilk.Gui
             ApplicationBarMenuItem pin = new ApplicationBarMenuItem(AppResources.PinAppbar);
             //settings.Click += new EventHandler(settings_Click);
             ApplicationBar.MenuItems.Add(pin);
-        }
-
-        private void ListsPivot_SelectionChanged(object sender, SelectionChangedEventArgs e)
-        {
-            if (e.AddedItems.Count == 0)
-            {
-                return;
-            }
-
-            if (e.AddedItems[0] is TaskList)
-            {
-                TaskList selectedList = e.AddedItems[0] as TaskList;
-
-                if (selectedList.Tasks == null || selectedList.Tasks.Count == 0)
-                {
-                    LoadList(selectedList);
-                }
-            }
-        }
-
-        private static void OnCurrentListChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
-        {
-            ListPage target = d as ListPage;
-            TaskList oldList = e.OldValue as TaskList;
-            TaskList newList = target.CurrentList;
-            target.OnCurrentListChanged(oldList, newList);
-        }
-
-        private void OnCurrentListChanged(TaskList oldList, TaskList newList)
-        {
-            if (newList != oldList)
-            {
-                Dispatcher.BeginInvoke((Action)(() =>
-                {
-                    ListsPivot.SelectedItem = newList;
-                }));
-            }
         }
     }
 }

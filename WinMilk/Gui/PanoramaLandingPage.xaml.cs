@@ -12,7 +12,7 @@ using System.Windows.Shapes;
 using Microsoft.Phone.Controls;
 using System.Windows.Data;
 using System.Collections.ObjectModel;
-using IronCow.Rest;
+using IronCow;
 
 namespace WinMilk
 {
@@ -31,34 +31,34 @@ namespace WinMilk
         }
 
         public static readonly DependencyProperty TodayTasksProperty =
-               DependencyProperty.Register("TodayTasks", typeof(ObservableCollection<RawTask>), typeof(PanoramaLandingPage),
-                   new PropertyMetadata(new ObservableCollection<RawTask>()));
+               DependencyProperty.Register("TodayTasks", typeof(ObservableCollection<Task>), typeof(PanoramaLandingPage),
+                   new PropertyMetadata(new ObservableCollection<Task>()));
 
-        public ObservableCollection<RawTask> TodayTasks
+        public ObservableCollection<Task> TodayTasks
         {
-            get { return (ObservableCollection<RawTask>)GetValue(TodayTasksProperty); }
+            get { return (ObservableCollection<Task>)GetValue(TodayTasksProperty); }
             set { SetValue(TodayTasksProperty, value); }
         }
 
-        public ObservableCollection<RawTask> TomorrowTasks
+        public ObservableCollection<Task> TomorrowTasks
         {
-            get { return (ObservableCollection<RawTask>)GetValue(TomorrowTasksProperty); }
+            get { return (ObservableCollection<Task>)GetValue(TomorrowTasksProperty); }
             set { SetValue(TomorrowTasksProperty, value); }
         }
 
         public static readonly DependencyProperty TomorrowTasksProperty =
-               DependencyProperty.Register("TomorrowTasks", typeof(ObservableCollection<RawTask>), typeof(PanoramaLandingPage),
-                   new PropertyMetadata(new ObservableCollection<RawTask>()));
+               DependencyProperty.Register("TomorrowTasks", typeof(ObservableCollection<Task>), typeof(PanoramaLandingPage),
+                   new PropertyMetadata(new ObservableCollection<Task>()));
 
-        public ObservableCollection<RawList> TaskLists
+        public ObservableCollection<TaskList> TaskLists
         {
-            get { return (ObservableCollection<RawList>)GetValue(TaskListsProperty); }
+            get { return (ObservableCollection<TaskList>)GetValue(TaskListsProperty); }
             set { SetValue(TaskListsProperty, value); }
         }
 
         public static readonly DependencyProperty TaskListsProperty =
-               DependencyProperty.Register("TaskLists", typeof(ObservableCollection<RawList>), typeof(PanoramaLandingPage),
-                   new PropertyMetadata(new ObservableCollection<RawList>()));
+               DependencyProperty.Register("TaskLists", typeof(ObservableCollection<TaskList>), typeof(PanoramaLandingPage),
+                   new PropertyMetadata(new ObservableCollection<TaskList>()));
 
 
         public PanoramaLandingPage()
@@ -70,6 +70,7 @@ namespace WinMilk
 
         protected override void OnNavigatedTo(System.Windows.Navigation.NavigationEventArgs e)
         {
+            _reload = true;
             LoadData();
 
             base.OnNavigatedTo(e);
@@ -77,82 +78,51 @@ namespace WinMilk
 
         private void LoadData()
         {
-            if (App.RtmClient.AuthToken != null)
+            if (_reload)
             {
-                this.IsLoading = true;
-
-                App.RtmClient.GetLists((RawList[] lists) =>
+                if (!string.IsNullOrEmpty(App.RtmClient.AuthToken))
                 {
-                    foreach (RawList l in lists)
+                    this.IsLoading = true;
+
+                    App.RtmClient.SyncEverything(() =>
                     {
-                        TaskLists.Add(l);
-                    }
-
-                    App.RtmClient.GetTasks(null, "", null, (RawList[] listsWithTasks) => 
-                    { 
-                        foreach (RawList l in listsWithTasks)
+                        Dispatcher.BeginInvoke(() =>
                         {
-                            foreach (RawTaskSeries s in l.TaskSeries)
+                            TaskLists = new ObservableCollection<TaskList>();
+                            foreach (TaskList l in App.RtmClient.TaskLists)
                             {
-                                foreach (RawTask t in s.Tasks)
-                                {
-                                    
-                                }
-                            }
-
-                        }
-                    });
-                });
-
-
-                App.RtmClient.GetLists((ObservableCollection<RTM.TaskList> lists) =>
-                {
-                    TaskLists = lists;
-
-                    App.RtmClient.GetAllIncompleteTasks((ObservableCollection<RTM.Task> incompleteTasks) =>
-                    {
-                        this.IsLoading = false;
-
-                        // Due on or before today
-                        App.RtmClient.GetTasks("dueBefore:tomorrow", (Task[] tasks) => 
-                        {
-                            foreach (Task t in tasks)
-                            {
-                                TodayTasks.Add(t);
+                                TaskLists.Add(l);
                             }
                         });
 
-                        // Due tomorrow
-                        App.RtmClient.GetTasks("due:tomorrow", (Task[] tasks) =>
+
+                        Dispatcher.BeginInvoke(() =>
                         {
-                            foreach (Task t in tasks)
+                            List<Task> today = App.RtmClient.GetTodayTasks();
+                            TodayTasks = new ObservableCollection<Task>();
+                            foreach (Task t in today)
+                            {
+                                TodayTasks.Add(t);
+                            }
+
+                            List<Task> tomorrow = App.RtmClient.GetTomorrowTasks();
+                            TomorrowTasks = new ObservableCollection<Task>();
+                            foreach (Task t in tomorrow)
                             {
                                 TomorrowTasks.Add(t);
                             }
                         });
 
-                        /*
-                        App.Rest.GetTasksInListsInOrder(lists, 0, (loadedLists) => 
+                        Dispatcher.BeginInvoke(() =>
                         {
-                            this.IsLoading = false;
-                        });*/
-
-                        // get count for tasks in non-smart lists
-                        foreach (RTM.TaskList l in lists)
-                        {
-                            if (l.IsNormal)
-                            {
-                                App.RtmClient.GetTasksInList(l, (t) => { }, false);
-                            }
-                        }
-
-                    }, _reload, RTM.Task.CompareByDate);
-                }, _reload);
-
-            }
-            else
-            {
-                Login();
+                            IsLoading = false;
+                        });
+                    });
+                }
+                else
+                {
+                    Login();
+                }
             }
 
             _reload = false;
@@ -176,7 +146,7 @@ namespace WinMilk
             ObservableCollection<TaskList> lists = list.ItemsSource as ObservableCollection<TaskList>;
             TaskList selected = lists[list.SelectedIndex];
 
-            this.NavigationService.Navigate(new Uri("/Gui/ListPage.xaml?id=" + selected.Id, UriKind.Relative));
+            this.NavigationService.Navigate(new Uri("/Gui/PivotListPage.xaml?id=" + selected.Id, UriKind.Relative));
 
             list.SelectedIndex = -1;
         }
@@ -257,12 +227,14 @@ namespace WinMilk
             SmartAddBox.IsEnabled = false;
             IsLoading = true;
 
+            /*
             App.RtmClient.AddTaskWithSmartAdd(SmartAddBox.Text, () =>
             {
                 IsLoading = false;
                 CloseSmartAdd();
                 LoadData();
             });
+             */
         }
 
         private void Overlay_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
@@ -296,7 +268,7 @@ namespace WinMilk
             MessageBoxResult logout = MessageBox.Show("Log out and erase your settings?", "Log out", MessageBoxButton.OKCancel);
             if (logout == MessageBoxResult.OK)
             {
-                
+                App.DeleteData();
                 Login();
             }
         }

@@ -21,7 +21,14 @@ namespace WinMilk.Gui.Controls
     {
         public bool HasItems
         {
-            get { return (this.ItemsSource as IList).Count > 0; }
+            get 
+            {
+                if (ItemsSource is IList)
+                {
+                    return (this.ItemsSource as IList).Count > 0;
+                }
+                return false;
+            }
         }
 
         public TaskListControl()
@@ -32,9 +39,6 @@ namespace WinMilk.Gui.Controls
             this.Loaded += new RoutedEventHandler(TaskListControl_Loaded);
 
             this.ItemTemplate = App.Current.Resources["TaskTemplate"] as DataTemplate;
-
-            this.SizeChanged += new SizeChangedEventHandler(list_SizeChanged);
-
         }
 
         void TaskListControl_Loaded(object sender, RoutedEventArgs e)
@@ -48,21 +52,36 @@ namespace WinMilk.Gui.Controls
                 return;
             }
 
-            ObservableCollection<Task> tasks = this.ItemsSource as ObservableCollection<Task>;
-            Task selectedTask = tasks[this.SelectedIndex];
+            Task selectedTask = null;
 
-            PhoneApplicationFrame frame = App.Current.RootVisual as PhoneApplicationFrame;
-            frame.Navigate(new Uri("/Gui/TaskDetailsPage.xaml?id=" + selectedTask.Id, UriKind.Relative));
+            if (ItemsSource is ObservableCollection<Task>)
+            {
+                ObservableCollection<Task> tasks = ItemsSource as ObservableCollection<Task>;
+                selectedTask = tasks[this.SelectedIndex];
+            }
+            else if (ItemsSource is TaskListTaskCollection)
+            {
+                TaskListTaskCollection tasks = ItemsSource as TaskListTaskCollection;
+                selectedTask = tasks[this.SelectedIndex];
+            }
+
+            if (selectedTask != null)
+            {
+                PhoneApplicationFrame frame = App.Current.RootVisual as PhoneApplicationFrame;
+                frame.Navigate(new Uri("/Gui/TaskDetailsPage.xaml?id=" + selectedTask.Id, UriKind.Relative));
+            }
 
             this.SelectedIndex = -1;
         }
 
-        public event PropertyChangedEventHandler PropertyChanged;
-
-        private void list_SizeChanged(object sender, SizeChangedEventArgs e)
+        protected override void OnItemsChanged(System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
         {
             if (this.PropertyChanged != null)
                 PropertyChanged(this, new PropertyChangedEventArgs("HasItems"));
+
+            base.OnItemsChanged(e);
         }
+
+        public event PropertyChangedEventHandler PropertyChanged;
     }
 }

@@ -12,9 +12,7 @@ using System.Windows.Navigation;
 using System.Windows.Shapes;
 using Microsoft.Phone.Controls;
 using Microsoft.Phone.Shell;
-using IronCow.Rest;
-using WinMilk.Rtm;
-using System.Collections.ObjectModel;
+using IronCow;
 
 namespace WinMilk
 {
@@ -26,7 +24,10 @@ namespace WinMilk
         /// <returns>The root frame of the Phone Application.</returns>
         public PhoneApplicationFrame RootFrame { get; private set; }
 
-        
+        private static readonly string RtmApiKey = "624a977e8a0e4ce69dec0196ce6479dd";
+        private static readonly string RtmSharedKey = "ea04c412d8a8ce87";
+
+        public static Rtm RtmClient;
 
         /// <summary>
         /// Constructor for the Application object.
@@ -57,18 +58,42 @@ namespace WinMilk
             InitializePhoneApplication();
         }
 
+        public static void LoadData()
+        {
+            string RtmAuthToken = Helper.IsolatedStorageHelper.GetObject<string>("RtmAuthToken");
+
+            if (!string.IsNullOrEmpty(RtmAuthToken))
+            {
+                RtmClient = new Rtm(RtmApiKey, RtmSharedKey, RtmAuthToken);
+            }
+            else
+            {
+                RtmClient = new Rtm(RtmApiKey, RtmSharedKey);
+            }
+        }
+
+        public static void SaveData()
+        {
+            Helper.IsolatedStorageHelper.SaveObject<string>("RtmAuthToken", RtmClient.AuthToken);
+        }
+
+        public static void DeleteData()
+        {
+            Helper.IsolatedStorageHelper.DeleteObject("RtmAuthToken");
+        }
+
         // Code to execute when the application is launching (eg, from Start)
         // This code will not execute when the application is reactivated
         private void Application_Launching(object sender, LaunchingEventArgs e)
         {
-            RtmProvider.LoadData();
+            LoadData();
         }
 
         // Code to execute when the application is activated (brought to foreground)
         // This code will not execute when the application is first launched
         private void Application_Activated(object sender, ActivatedEventArgs e)
         {
-            RtmProvider.LoadData();
+            LoadData();
         }
 
         // Code to execute when the application is deactivated (sent to background)
@@ -76,14 +101,14 @@ namespace WinMilk
         private void Application_Deactivated(object sender, DeactivatedEventArgs e)
         {
             // Ensure that required application state is persisted here.
-            RtmProvider.SaveData();
+            SaveData();
         }
 
         // Code to execute when the application is closing (eg, user hit Back)
         // This code will not execute when the application is deactivated
         private void Application_Closing(object sender, ClosingEventArgs e)
         {
-            RtmProvider.SaveData();
+            SaveData();
         }
 
         // Code to execute if a navigation fails
@@ -135,6 +160,8 @@ namespace WinMilk
             // Set the root visual to allow the application to render
             if (RootVisual != RootFrame)
                 RootVisual = RootFrame;
+
+            Rtm.Dispatcher = App.Current.RootVisual.Dispatcher;
 
             // Remove this handler since it is no longer needed
             RootFrame.Navigated -= CompleteInitializePhoneApplication;

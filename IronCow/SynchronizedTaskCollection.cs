@@ -9,12 +9,6 @@ namespace IronCow
 {
     public abstract class SynchronizedTaskCollection<T> : ICollection<T>, INotifyCollectionChanged, INotifyPropertyChanged, ISyncing
     {
-        #region Callback Delegates
-
-        public delegate void VoidCallback();
-
-        #endregion
-
         #region Constants
         private const string CountName = "Count";
         private const string IndexerName = "Item[]";
@@ -55,9 +49,9 @@ namespace IronCow
         #endregion
 
         #region Virtual Protected Members
-        protected abstract Request CreateClearItemsRequest(VoidCallback callback);
-        protected abstract Request CreateAddItemRequest(T item, VoidCallback callback);
-        protected abstract Request CreateRemoveItemRequest(T item, VoidCallback callback);
+        protected abstract Request CreateClearItemsRequest();
+        protected abstract Request CreateAddItemRequest(T item);
+        protected abstract Request CreateRemoveItemRequest(T item);
 
         protected virtual void OnSyncingChanged()
         {
@@ -117,13 +111,13 @@ namespace IronCow
         #endregion
 
         #region ICollection<T> Members
-        public void Add(T item, VoidCallback callback)
+        public void Add(T item)
         {
             lock (mSyncRoot)
             {
                 if (Syncing && Task.IsSynced)
                 {
-                    Request request = CreateAddItemRequest(item, callback);
+                    Request request = CreateAddItemRequest(item);
                     Task.Owner.ExecuteRequest(request);
                 }
                 AddItem(item);
@@ -134,13 +128,13 @@ namespace IronCow
             }
         }
 
-        public void Clear(VoidCallback callback)
+        public void Clear()
         {
             lock (mSyncRoot)
             {
                 if (Syncing && Task.IsSynced)
                 {
-                    Request request = CreateClearItemsRequest(callback);
+                    Request request = CreateClearItemsRequest();
                     Task.Owner.ExecuteRequest(request);
                 }
                 ClearItems();
@@ -183,7 +177,7 @@ namespace IronCow
             get { return false; }
         }
 
-        public bool Remove(T item, VoidCallback callback)
+        public bool Remove(T item)
         {
             lock (mSyncRoot)
             {
@@ -192,7 +186,7 @@ namespace IronCow
                 {
                     if (Syncing && Task.IsSynced)
                     {
-                        Request request = CreateRemoveItemRequest(item, callback);
+                        Request request = CreateRemoveItemRequest(item);
                         Task.Owner.ExecuteRequest(request);
                     }
                     RemoveItem(item);
