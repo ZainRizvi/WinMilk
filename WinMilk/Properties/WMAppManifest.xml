@@ -1,0 +1,23 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+
+<Deployment xmlns="http://schemas.microsoft.com/windowsphone/2009/deployment" AppPlatformVersion="7.0">
+  <App xmlns="" ProductID="{c0568efe-26bd-4c9c-9ced-a890f385db15}" Title="WinMilk" RuntimeType="Silverlight" Version="1.0.0.0" Genre="apps.normal"  Author="Juliana Pena" Description="Task manager that syncs with Remember the Milk" Publisher="WinMilk">
+    <IconPath IsRelative="true" IsResource="false">ApplicationIcon.png</IconPath>
+    <Capabilities>
+      <Capability Name="ID_CAP_NETWORKING"/>
+      <Capability Name="ID_CAP_WEBBROWSERCOMPONENT"/>
+    </Capabilities>
+    <Tasks>
+      <DefaultTask  Name ="_default" NavigationPage="Gui/PivotLandingPage.xaml"/>
+    </Tasks>
+    <Tokens>
+      <PrimaryToken TokenID="WinMilkToken" TaskName="_default">
+        <TemplateType5>
+          <BackgroundImageURI IsRelative="true" IsResource="false">Background.png</BackgroundImageURI>
+          <Count>0</Count>
+          <Title>WinMilk</Title>
+        </TemplateType5>
+      </PrimaryToken>
+    </Tokens>
+  </App>
+</Deployment>
