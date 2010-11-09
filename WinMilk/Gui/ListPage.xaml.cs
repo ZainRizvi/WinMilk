@@ -1,18 +1,8 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.Linq;
-using System.Net;
 using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Animation;
-using System.Windows.Shapes;
+using IronCow;
 using Microsoft.Phone.Controls;
 using Microsoft.Phone.Shell;
-using IronCow;
 using WinMilk.Helper;
 
 namespace WinMilk.Gui
@@ -73,6 +63,16 @@ namespace WinMilk.Gui
                 // set current list
                 int id = int.Parse(idStr);
                 CurrentList = App.RtmClient.TaskLists.GetById(id);
+
+                // if current list is smart list, disable add button
+                if (CurrentList.IsSmart)
+                {
+                    (ApplicationBar.Buttons[0] as ApplicationBarIconButton).IsEnabled = false;
+                }
+                else
+                {
+                    (ApplicationBar.Buttons[0] as ApplicationBarIconButton).IsEnabled = true;
+                }
             }
         }
 

@@ -1,20 +1,11 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Xml.Serialization;
 using System.Net;
 using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Animation;
 using System.Windows.Navigation;
-using System.Windows.Shapes;
-using Microsoft.Phone.Controls;
-using Microsoft.Phone.Shell;
 using IronCow;
 using IronCow.Rest;
+using Microsoft.Phone.Controls;
+using Microsoft.Phone.Shell;
 using WinMilk.Helper;
 
 namespace WinMilk
@@ -167,16 +158,32 @@ namespace WinMilk
                 {
                     MessageBox.Show(ex.Message, "Error " + ex.Code, MessageBoxButton.OK);
                 });
-                e.Handled = true;
+            }
+            else if (e.ExceptionObject is WebException)
+            {
+                WebException ex = e.ExceptionObject as WebException;
+
+                RootFrame.Dispatcher.BeginInvoke(() =>
+                {
+                    MessageBox.Show(ex.Message + "\nAre you connected to the Internet?", "Error contacting server", MessageBoxButton.OK);
+                });
             }
             else
             {
-
-                if (System.Diagnostics.Debugger.IsAttached)
+                RootFrame.Dispatcher.BeginInvoke(() =>
                 {
-                    // An unhandled exception has occurred; break into the debugger
-                    System.Diagnostics.Debugger.Break();
-                }
+                    Exception ex = e.ExceptionObject;
+
+                    MessageBox.Show(ex.Message, ex.GetType().ToString(), MessageBoxButton.OK);
+                });
+            }
+
+            e.Handled = true;
+
+            if (System.Diagnostics.Debugger.IsAttached)
+            {
+                // An unhandled exception has occurred; break into the debugger
+                System.Diagnostics.Debugger.Break();
             }
         }
 
