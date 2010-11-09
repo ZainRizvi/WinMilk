@@ -1,10 +1,9 @@
 ﻿using System;
-using System.Linq;
 using System.Collections.Generic;
-using System.Collections.Specialized;
-using IronCow.Rest;
-using System.Windows.Threading;
 using System.Collections.ObjectModel;
+using System.Linq;
+using System.Windows.Threading;
+using IronCow.Rest;
 
 namespace IronCow
 {
@@ -765,11 +764,14 @@ namespace IronCow
         {
             if (Client is RestClient)
             {
-                (Client as RestClient).AddTask(name, parse, listId, CurrentTimeline, (list) =>
+                GetOrStartTimeline((t) =>
                 {
-                    CacheTasks(() =>
+                    (Client as RestClient).AddTask(name, parse, listId, CurrentTimeline, (list) =>
                     {
-                        callback();
+                        CacheTasks(() =>
+                        {
+                            callback();
+                        });
                     });
                 });
             }

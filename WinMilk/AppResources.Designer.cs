@@ -61,11 +61,173 @@ namespace WinMilk {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Juliana Peña.
+        /// </summary>
+        public static string AboutAuthorLink {
+            get {
+                return ResourceManager.GetString("AboutAuthorLink", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Buy me a cup of coffee!.
+        /// </summary>
+        public static string AboutCoffeeLink {
+            get {
+                return ResourceManager.GetString("AboutCoffeeLink", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Like this app?.
+        /// </summary>
+        public static string AboutCoffeePrompt {
+            get {
+                return ResourceManager.GetString("AboutCoffeePrompt", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Created by.
+        /// </summary>
+        public static string AboutCreatedBy {
+            get {
+                return ResourceManager.GetString("AboutCreatedBy", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to This app uses the Remember The Milk API but is not endorsed or certified by Remember The Milk..
+        /// </summary>
+        public static string AboutDisclaimer {
+            get {
+                return ResourceManager.GetString("AboutDisclaimer", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to ok.
+        /// </summary>
+        public static string AboutOK {
+            get {
+                return ResourceManager.GetString("AboutOK", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to about.
+        /// </summary>
+        public static string AboutPageHeader {
+            get {
+                return ResourceManager.GetString("AboutPageHeader", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Go To Remember the Milk.
+        /// </summary>
+        public static string AboutRTMLink {
+            get {
+                return ResourceManager.GetString("AboutRTMLink", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Version 1.1.
+        /// </summary>
+        public static string AboutVersion {
+            get {
+                return ResourceManager.GetString("AboutVersion", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Visit WinMilk&apos;s site.
+        /// </summary>
+        public static string AboutVisitSite {
+            get {
+                return ResourceManager.GetString("AboutVisitSite", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to add task.
         /// </summary>
         public static string AddTaskAppbar {
             get {
                 return ResourceManager.GetString("AddTaskAppbar", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Due.
+        /// </summary>
+        public static string AddTaskDue {
+            get {
+                return ResourceManager.GetString("AddTaskDue", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Day.
+        /// </summary>
+        public static string AddTaskDueDay {
+            get {
+                return ResourceManager.GetString("AddTaskDueDay", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Never.
+        /// </summary>
+        public static string AddTaskDueNever {
+            get {
+                return ResourceManager.GetString("AddTaskDueNever", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Time.
+        /// </summary>
+        public static string AddTaskDueTime {
+            get {
+                return ResourceManager.GetString("AddTaskDueTime", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to List.
+        /// </summary>
+        public static string AddTaskList {
+            get {
+                return ResourceManager.GetString("AddTaskList", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Name.
+        /// </summary>
+        public static string AddTaskName {
+            get {
+                return ResourceManager.GetString("AddTaskName", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Priority.
+        /// </summary>
+        public static string AddTaskPriority {
+            get {
+                return ResourceManager.GetString("AddTaskPriority", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to None.
+        /// </summary>
+        public static string AddTaskPriorityNone {
+            get {
+                return ResourceManager.GetString("AddTaskPriorityNone", resourceCulture);
             }
         }
         
@@ -79,7 +241,25 @@ namespace WinMilk {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Advanced....
+        ///   Looks up a localized string similar to Tags.
+        /// </summary>
+        public static string AddTaskTags {
+            get {
+                return ResourceManager.GetString("AddTaskTags", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to add task.
+        /// </summary>
+        public static string AddTaskTitle {
+            get {
+                return ResourceManager.GetString("AddTaskTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to advanced....
         /// </summary>
         public static string AdvancedTaskAddLink {
             get {
@@ -133,7 +313,7 @@ namespace WinMilk {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to log in.
+        ///   Looks up a localized string similar to LOG IN.
         /// </summary>
         public static string AuthPageTitle {
             get {
@@ -237,6 +417,15 @@ namespace WinMilk {
         public static string MoreLogoutButton {
             get {
                 return ResourceManager.GetString("MoreLogoutButton", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to report bug or suggest feature.
+        /// </summary>
+        public static string MoreReportButton {
+            get {
+                return ResourceManager.GetString("MoreReportButton", resourceCulture);
             }
         }
         

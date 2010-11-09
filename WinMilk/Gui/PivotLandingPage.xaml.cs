@@ -1,22 +1,13 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Net;
+using System.Collections.ObjectModel;
+using System.ComponentModel;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Animation;
-using System.Windows.Shapes;
-using Microsoft.Phone.Controls;
-using System.Windows.Data;
-using System.Collections.ObjectModel;
 using IronCow;
+using Microsoft.Phone.Controls;
+using Microsoft.Phone.Shell;
 using Microsoft.Phone.Tasks;
 using WinMilk.Helper;
-using Microsoft.Phone.Shell;
-using System.ComponentModel;
 
 namespace WinMilk.Gui
 {
@@ -124,11 +115,8 @@ namespace WinMilk.Gui
 
         private void PhoneApplicationPage_Loaded(object sender, RoutedEventArgs e)
         {
-            if (sReload)
-            {
-                LoadData();
-                SyncData();
-            }
+            LoadData();
+            SyncData();
         }
 
         private void CreateApplicationBar()
@@ -159,16 +147,14 @@ namespace WinMilk.Gui
             about.Click += new EventHandler(AboutButton_Click);
             ApplicationBar.MenuItems.Add(about);
 
-            ApplicationBarMenuItem donate = new ApplicationBarMenuItem(AppResources.MoreDonateButton);
+            /*** Removed as per Microsoft Policies :( ***/
+            /*ApplicationBarMenuItem donate = new ApplicationBarMenuItem(AppResources.MoreDonateButton);
             donate.Click += new EventHandler(DonateButton_Click);
-            ApplicationBar.MenuItems.Add(donate);
-        }
+            ApplicationBar.MenuItems.Add(donate);*/
 
-        protected override void OnNavigatedTo(System.Windows.Navigation.NavigationEventArgs e)
-        {
-            
-
-            base.OnNavigatedTo(e);
+            ApplicationBarMenuItem report = new ApplicationBarMenuItem(AppResources.MoreReportButton);
+            report.Click += new EventHandler(ReportButton_Click);
+            ApplicationBar.MenuItems.Add(report);
         }
 
         protected override void OnBackKeyPress(System.ComponentModel.CancelEventArgs e)
@@ -191,27 +177,32 @@ namespace WinMilk.Gui
             BackgroundWorker b = new BackgroundWorker();
             b.DoWork += (s, e) =>
             {
-                if (!string.IsNullOrEmpty(App.RtmClient.AuthToken))
+                if (sReload)
                 {
-                    SmartDispatcher.BeginInvoke(() =>
+                    if (!string.IsNullOrEmpty(App.RtmClient.AuthToken))
                     {
-                        this.IsLoading = true;
-                    });
-
-                    App.RtmClient.SyncEverything(() =>
-                    {
-                        LoadData();
-
                         SmartDispatcher.BeginInvoke(() =>
                         {
-                            IsLoading = false;
+                            this.IsLoading = true;
                         });
-                    });
+
+                        App.RtmClient.SyncEverything(() =>
+                        {
+                            LoadData();
+
+                            SmartDispatcher.BeginInvoke(() =>
+                            {
+                                IsLoading = false;
+                            });
+                        });
+                    }
+                    else
+                    {
+                        Login();
+                    }
                 }
-                else
-                {
-                    Login();
-                }
+
+                sReload = false;
             };
 
             b.RunWorkerAsync();
@@ -359,6 +350,7 @@ namespace WinMilk.Gui
 
         private void Sync_Click(object sender, EventArgs e)
         {
+            sReload = true;
             SyncData();
         }
 
@@ -410,12 +402,23 @@ namespace WinMilk.Gui
             });
         }
 
+        private void ReportButton_Click(object sender, EventArgs e)
+        {
+            EmailComposeTask emailComposeTask = new EmailComposeTask();
+            emailComposeTask.To = "winmilk@julianapena.com";
+            emailComposeTask.Subject = "WinMilk bug or suggestion";
+            emailComposeTask.Show();
+        }
+
+        /*** Removed as per Microsoft Policies :( ***/
+        /*
         private void DonateButton_Click(object sender, EventArgs e)
         {
             WebBrowserTask page = new WebBrowserTask();
             page.URL = "http://julianapena.com/donate.html?ref=WinMilk";
             page.Show();
         }
+        */
 
         #endregion
     }

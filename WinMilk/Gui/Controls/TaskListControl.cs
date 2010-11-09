@@ -1,24 +1,15 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Net;
-using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Documents;
-using System.Windows.Ink;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Animation;
-using System.Windows.Shapes;
-using Microsoft.Phone.Controls;
-using System.ComponentModel;
 using System.Collections;
 using System.Collections.ObjectModel;
+using System.ComponentModel;
+using System.Windows;
+using System.Windows.Controls;
 using IronCow;
-using Delay;
+using Microsoft.Phone.Controls;
 
 namespace WinMilk.Gui.Controls
 {
-    public class TaskListControl : DeferredLoadListBox, INotifyPropertyChanged
+    public class TaskListControl : ListBox, INotifyPropertyChanged
     {
         public bool HasItems
         {
@@ -40,8 +31,6 @@ namespace WinMilk.Gui.Controls
             this.Loaded += new RoutedEventHandler(TaskListControl_Loaded);
 
             this.ItemTemplate = App.Current.Resources["TaskTemplate"] as DataTemplate;
-            this.ItemContainerStyle = App.Current.Resources["TaskContainterStyle"] as Style;
-            this.ItemsPanel = App.Current.Resources["TaskPanelTemplate"] as ItemsPanelTemplate;
         }
 
         void TaskListControl_Loaded(object sender, RoutedEventArgs e)
