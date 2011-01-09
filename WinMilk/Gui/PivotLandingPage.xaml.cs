@@ -8,6 +8,7 @@ using Microsoft.Phone.Controls;
 using Microsoft.Phone.Shell;
 using Microsoft.Phone.Tasks;
 using WinMilk.Helper;
+using WinMilk.Gui.Controls;
 
 namespace WinMilk.Gui
 {
@@ -110,7 +111,29 @@ namespace WinMilk.Gui
             InitializeComponent();
             CreateApplicationBar();
 
+            // Setup our context menus.
+            OverdueList.AddContextMenu(TaskListContextMenuClick);
+            TodayList.AddContextMenu(TaskListContextMenuClick);
+            TomorrowList.AddContextMenu(TaskListContextMenuClick);
+            WeekList.AddContextMenu(TaskListContextMenuClick);
+            NoDueList.AddContextMenu(TaskListContextMenuClick);
+
             IsLoading = false;
+
+            // Start on the pivot that the user has selected on the settings page.
+            AppSettings settings = new AppSettings();
+            if (settings.StartPageSetting == 0)
+            {
+                Pivot.SelectedItem = TasksPanel;
+            }
+            else if (settings.StartPageSetting == 1)
+            {
+                Pivot.SelectedItem = ListsPanel;
+            }
+            else if (settings.StartPageSetting == 2)
+            {
+                Pivot.SelectedItem = TagsPanel;
+            }
         }
 
         private void PhoneApplicationPage_Loaded(object sender, RoutedEventArgs e)
@@ -139,6 +162,11 @@ namespace WinMilk.Gui
             search.Click += new EventHandler(SearchButton_Click);
             ApplicationBar.Buttons.Add(search);
 
+            ApplicationBarIconButton settings = new ApplicationBarIconButton(new Uri("/icons/appbar.feature.settings.rest.png", UriKind.Relative));
+            settings.Text = AppResources.MoreSettingsButton;
+            settings.Click += new EventHandler(SettingsButton_Click);
+            ApplicationBar.Buttons.Add(settings);
+
             ApplicationBarMenuItem logout = new ApplicationBarMenuItem(AppResources.MoreLogoutButton);
             logout.Click += new EventHandler(LogoutButton_Click);
             ApplicationBar.MenuItems.Add(logout);
@@ -146,11 +174,6 @@ namespace WinMilk.Gui
             ApplicationBarMenuItem about = new ApplicationBarMenuItem(AppResources.MoreAboutButton);
             about.Click += new EventHandler(AboutButton_Click);
             ApplicationBar.MenuItems.Add(about);
-
-            /*** Removed as per Microsoft Policies :( ***/
-            /*ApplicationBarMenuItem donate = new ApplicationBarMenuItem(AppResources.MoreDonateButton);
-            donate.Click += new EventHandler(DonateButton_Click);
-            ApplicationBar.MenuItems.Add(donate);*/
 
             ApplicationBarMenuItem report = new ApplicationBarMenuItem(AppResources.MoreReportButton);
             report.Click += new EventHandler(ReportButton_Click);
@@ -354,11 +377,6 @@ namespace WinMilk.Gui
             SyncData();
         }
 
-        private void SettingsButton_Click(object sender, EventArgs e)
-        {
-            this.NavigationService.Navigate(new Uri("/Gui/SettingsPage.xaml", UriKind.Relative));
-        }
-
         private void LogoutButton_Click(object sender, EventArgs e)
         {
             MessageBoxResult logout = MessageBox.Show(AppResources.LogOutMessageBoxText, AppResources.LogOutMessageBoxTitle, MessageBoxButton.OKCancel);
@@ -381,7 +399,12 @@ namespace WinMilk.Gui
 
         private void AboutButton_Click(object sender, EventArgs e)
         {
-            this.NavigationService.Navigate(new Uri("/Gui/AboutPage.xaml", UriKind.Relative));
+            this.NavigationService.Navigate(new Uri("/Gui/PivotHelpPage.xaml?Page=About", UriKind.Relative));
+        }
+
+        private void SettingsButton_Click(object sender, EventArgs e)
+        {
+            this.NavigationService.Navigate(new Uri("/Gui/PivotHelpPage.xaml?Page=Settings", UriKind.Relative));
         }
 
         private void AddTaskPopup_Submit(object sender, WinMilk.Gui.Controls.SubmitEventArgs e)
@@ -408,6 +431,40 @@ namespace WinMilk.Gui
             emailComposeTask.To = "winmilk@julianapena.com";
             emailComposeTask.Subject = "WinMilk bug or suggestion";
             emailComposeTask.Show();
+        }
+
+        /// <summary>
+        ///     This event is fired when a context menu action for an item is selected (Complete/Postpone).
+        /// </summary>
+        private void TaskListContextMenuClick(string menuItem, Task task)
+        {
+            // now that we have the associated task, we can take action on it.
+            if (menuItem == "Complete")
+            {
+                task.Complete(() =>
+                {
+                    Dispatcher.BeginInvoke(() =>
+                    {
+                        IsLoading = false;
+                    });
+
+                    sReload = true;
+                    LoadData();
+                });
+            }
+            else if (menuItem == "Postpone")
+            {
+                task.Postpone(() =>
+                {
+                    Dispatcher.BeginInvoke(() =>
+                    {
+                        IsLoading = false;
+                    });
+
+                    sReload = true;
+                    LoadData();
+                });
+            }
         }
 
         /*** Removed as per Microsoft Policies :( ***/
