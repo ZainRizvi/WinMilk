@@ -142,7 +142,7 @@
     <value>Ir a Remember the Milk</value>
   </data>
   <data name="AboutVersion" xml:space="preserve">
-    <value>Versión 1.2</value>
+    <value>Versión 1.3</value>
   </data>
   <data name="AddTaskAppbar" xml:space="preserve">
     <value>agregar tarea</value>
@@ -211,7 +211,7 @@
     <value>buscar</value>
   </data>
   <data name="MoreSettingsButton" xml:space="preserve">
-    <value>configuración</value>
+    <value>opciones</value>
   </data>
   <data name="MoreTagsButton" xml:space="preserve">
     <value>etiquetas</value>
@@ -371,5 +371,11 @@
   </data>
   <data name="TaskShareUrl" xml:space="preserve">
     <value>Url</value>
+  </data>
+  <data name="SettingsPageHeader" xml:space="preserve">
+    <value>opciones</value>
+  </data>
+  <data name="SettingsStartPage" xml:space="preserve">
+    <value>Página de inicio</value>
   </data>
 </root>

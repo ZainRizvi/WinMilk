@@ -11,7 +11,7 @@
     FontFamily="{StaticResource PhoneFontFamilyNormal}"
     FontSize="{StaticResource PhoneFontSizeNormal}"
     Foreground="{StaticResource PhoneForegroundBrush}"
-    SupportedOrientations="Portrait" Orientation="Portrait"
+    SupportedOrientations="PortraitOrLandscape" Orientation="Portrait"
     mc:Ignorable="d" d:DesignHeight="768" d:DesignWidth="480"
     DataContext="{Binding RelativeSource={RelativeSource Self}}"
     shell:SystemTray.IsVisible="True"
@@ -36,7 +36,7 @@
 
             <!--ContentPanel - place additional content here-->
             <Grid x:Name="ContentPanel" Grid.Row="1" Margin="12,0,12,0" DataContext="{Binding CurrentTag}">
-                <con:TaskListControl ItemsSource="{Binding Tasks}" />
+                <con:TaskListControl x:Name="TaskList" ItemsSource="{Binding Tasks}" />
             </Grid>
         </Grid>
 
